@@ -1,0 +1,12 @@
+# firebase key
+*.json
+
+# python cache
+__pycache__/
+*.pyc
+
+# pycharm
+.idea/
+
+# virtual environment (if exists)
+venv/
