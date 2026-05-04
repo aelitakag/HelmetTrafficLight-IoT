@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Helmet Traffic System</title>
+  <style>
+    :root {
+      --bg: #040814;
+      --panel: rgba(15, 23, 42, 0.64);
+      --panel-strong: rgba(15, 23, 42, 0.86);
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --soft: #cbd5e1;
+      --emerald: #34d399;
+      --cyan: #22d3ee;
+      --rose: #fb7185;
+      --amber: #fbbf24;
+      --indigo: #818cf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: #040814;
+    }
+
+    .blob {
+      position: absolute;
+      width: 58vw;
+      height: 58vw;
+      border-radius: 999px;
+      filter: blur(120px);
+      opacity: 0.22;
+      animation: float 13s ease-in-out infinite alternate;
+    }
+
+    .blob.one { top: -24%; left: -14%; background: var(--emerald); }
+    .blob.two { top: 18%; right: -24%; background: var(--cyan); animation-delay: 2s; }
+    .blob.three { bottom: -30%; left: 12%; background: var(--indigo); animation-delay: 4s; }
+
+    .orb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .orb.one { width: min(118vw, 1420px); height: min(118vw, 1420px); }
+    .orb.two { width: min(82vw, 1000px); height: min(82vw, 1000px); border-color: rgba(34, 211, 238, 0.14); }
+    .orb.three { width: min(52vw, 620px); height: min(52vw, 620px); border-color: rgba(52, 211, 153, 0.17); }
+
+    @keyframes float {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(38px, -32px) scale(1.08); }
+    }
+
+    .container { width: min(1180px, 92%); margin: auto; }
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 18px 54px rgba(0, 0, 0, 0.28);
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(4, 8, 20, 0.78);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 1.45rem; font-weight: 900; letter-spacing: -0.04em; }
+    .brand svg { color: var(--emerald); }
+    .brand span span { color: var(--emerald); }
+
+    .nav-links { display: flex; gap: 28px; color: var(--soft); font-weight: 700; font-size: 0.96rem; }
+    .nav-links a { transition: 0.2s; opacity: 0.88; }
+    .nav-links a:hover { color: var(--emerald); opacity: 1; }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      color: #a7f3d0;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      background: rgba(52, 211, 153, 0.1);
+      font-weight: 800;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 140px 0 92px;
+    }
+
+    .hero-inner { max-width: 1050px; margin: auto; display: flex; flex-direction: column; align-items: center; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      color: #67e8f9;
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      font-size: 0.88rem;
+      font-weight: 900;
+      margin-bottom: 28px;
+      box-shadow: 0 0 26px rgba(34, 211, 238, 0.12);
+    }
+
+    h1 {
+      font-size: clamp(3.2rem, 8vw, 7.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.075em;
+      font-weight: 950;
+      margin-bottom: 28px;
+      text-shadow: 0 22px 70px rgba(0,0,0,0.38);
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      max-width: 890px;
+      color: var(--soft);
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      font-weight: 300;
+      padding: 22px 28px;
+      border-radius: 28px;
+      background: rgba(15, 23, 42, 0.34);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      margin-bottom: 40px;
+    }
+
+    .btn-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-width: 190px;
+      padding: 15px 28px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 950;
+      transition: 0.25s ease;
+    }
+
+    .btn-primary {
+      color: #03140c;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      box-shadow: 0 0 42px rgba(16, 185, 129, 0.32);
+    }
+
+    .btn-secondary { color: white; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+    .btn:hover { transform: translateY(-4px); }
+
+    section { padding: 116px 0; position: relative; }
+    .section-muted { background: rgba(15, 23, 42, 0.34); border-block: 1px solid rgba(255,255,255,0.05); }
+
+    .section-title { text-align: center; max-width: 780px; margin: 0 auto 64px; }
+    .section-title h2 { font-size: clamp(2.4rem, 5vw, 4.3rem); line-height: 1.08; letter-spacing: -0.055em; margin-bottom: 16px; }
+    .section-title p { color: var(--muted); font-size: 1.14rem; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+
+    .card {
+      border-radius: 30px;
+      padding: 32px;
+      transition: 0.28s ease;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.045), transparent 48%);
+      opacity: 0;
+      transition: 0.28s ease;
+      pointer-events: none;
+    }
+
+    .card:hover { transform: translateY(-6px); background: var(--panel-strong); border-color: rgba(148, 163, 184, 0.2); }
+    .card:hover::before { opacity: 1; }
+    .card h3 { font-size: 1.45rem; margin: 18px 0 10px; letter-spacing: -0.03em; }
+    .card p { color: var(--muted); }
+
+    .icon-box {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.32);
+      color: var(--soft);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .icon-box svg { width: 30px; height: 30px; stroke-width: 1.75; }
+    .emerald { color: var(--emerald); }
+    .cyan { color: var(--cyan); }
+    .rose { color: var(--soft); }
+    .amber { color: var(--soft); }
+    .indigo { color: var(--soft); }
+
+    .problem-card:first-child,
+    .problem-card:last-child { border-color: var(--border); }
+    .problem-card:first-child .icon-box { color: var(--rose); }
+    .problem-card:last-child .icon-box { color: var(--emerald); }
+
+    .step-card {
+      position: relative;
+      padding-top: 34px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .step-card .icon-box { margin-bottom: 10px; color: var(--cyan); }
+    .step-card h3, .step-card p { text-align: center; }
+
+    .step-number {
+      width: auto;
+      height: auto;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      margin-bottom: 18px;
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--soft);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      font-weight: 900;
+      box-shadow: none;
+    }
+
+    .architecture-card { position: relative; }
+    .architecture-card:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -19px;
+      top: 50%;
+      width: 30px;
+      height: 30px;
+      border-top: 3px solid var(--cyan);
+      border-right: 3px solid var(--cyan);
+      transform: translateY(-50%) rotate(45deg);
+      opacity: 0.8;
+    }
+
+    .model-wrap {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 54px;
+      align-items: center;
+    }
+
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--emerald); font-size: 0.82rem; font-weight: 950; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    .model-text h2 { font-size: clamp(2.2rem, 4.5vw, 3.8rem); line-height: 1.08; letter-spacing: -0.055em; margin-bottom: 20px; }
+    .model-text p { color: var(--soft); font-size: 1.08rem; margin-bottom: 24px; }
+    .logic-list { display: grid; gap: 14px; list-style: none; color: var(--muted); }
+    .logic-list li { display: flex; align-items: flex-start; gap: 12px; }
+    .logic-list svg { color: var(--emerald); flex: 0 0 auto; margin-top: 4px; }
+
+    .result-visual { border-radius: 42px; padding: 46px; text-align: center; border-color: rgba(52, 211, 153, 0.2); }
+    .result-chip { width: 106px; height: 106px; border-radius: 28px; margin: 0 auto 28px; display: grid; place-items: center; background: rgba(2,6,23,0.8); border: 1px solid rgba(148,163,184,0.28); position: relative; }
+    .result-chip::after { content: ""; position: absolute; inset: 12px; border: 2px solid rgba(52,211,153,0.45); border-radius: 18px; }
+    .result-chip svg { color: var(--emerald); width: 44px; height: 44px; position: relative; z-index: 1; }
+
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: stretch; }
+    .demo-image { aspect-ratio: 16 / 9; border-radius: 26px; border: 1px solid rgba(148,163,184,0.18); background: #020617; display: grid; place-items: center; color: var(--muted); margin-bottom: 22px; overflow: hidden; width: 100%; }
+    .demo-image iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .output-list { display: grid; gap: 14px; width: 100%; }
+    .output-row { display: flex; justify-content: space-between; gap: 20px; padding: 17px 18px; border-radius: 18px; background: rgba(2,6,23,0.52); border: 1px solid rgba(255,255,255,0.06); color: var(--muted); }
+    .output-row strong { color: white; }
+    .output-row.warning { background: rgba(251,113,133,0.1); border-color: rgba(251,113,133,0.28); }
+    .output-row.warning strong { color: var(--rose); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; margin-top: 24px; }
+    .metric { padding: 22px; border-radius: 22px; background: rgba(2,6,23,0.42); border: 1px solid var(--border); text-align: center; }
+    .metric strong { display: block; color: var(--emerald); font-size: 1.8rem; margin-bottom: 4px; }
+    .metric span { color: var(--muted); }
+
+    .team-card .avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      border: 4px solid rgba(15,23,42,0.9);
+      box-shadow: 0 18px 44px rgba(0,0,0,0.24);
+      margin-bottom: 18px;
+    }
+
+    footer { padding: 26px 0; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(2,6,23,0.5); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 18px; color: var(--muted); }
+
+    .svg-sprite { display: none; }
+
+    @media (max-width: 980px) {
+      .nav-links, .nav-cta { display: none; }
+      .grid-2, .grid-3, .grid-4, .grid-5, .model-wrap, .demo-grid, .metrics { grid-template-columns: 1fr; }
+      .architecture-card:not(:last-child)::after { display: none; }
+      .hero { padding-top: 118px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="shield-alert" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4" fill="none" stroke="currentColor" stroke-linecap="round"/><path d="M12 16h.01" fill="none" stroke="currentColor" stroke-linecap="round"/></symbol>
+    <symbol id="camera" viewBox="0 0 24 24"><path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor"/></symbol>
+    <symbol id="server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="2" fill="none" stroke="currentColor"/><rect x="3" y="14" width="18" height="6" rx="2" fill="none" stroke="currentColor"/><path d="M7 7h.01M7 17h.01" stroke="currentColor" stroke-linecap="round"/></symbol>
+    <symbol id="brain" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3v1a4 4 0 0 0 0 8v1a3 3 0 0 0 5 2.2M15 3a3 3 0 0 1 3 3v1a4 4 0 0 1 0 8v1a3 3 0 0 1-5 2.2M12 5v14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" fill="none" stroke="currentColor"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" fill="none" stroke="currentColor"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" fill="none" stroke="currentColor"/></symbol>
+    <symbol id="cpu" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="none" stroke="currentColor"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3" stroke="currentColor" stroke-linecap="round"/></symbol>
+    <symbol id="wifi" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 20h.01" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="traffic" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="20" rx="4" fill="none" stroke="currentColor"/><circle cx="12" cy="7" r="1.5" fill="none" stroke="currentColor"/><circle cx="12" cy="12" r="1.5" fill="none" stroke="currentColor"/><circle cx="12" cy="17" r="1.5" fill="none" stroke="currentColor"/></symbol>
+    <symbol id="code" viewBox="0 0 24 24"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 4l-4 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="cloud" viewBox="0 0 24 24"><path d="M17.5 19H8a5 5 0 1 1 1-9.9A6 6 0 0 1 20 11.5 3.8 3.8 0 0 1 17.5 19Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="chart" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16" fill="none" stroke="currentColor" stroke-linecap="round"/><path d="M8 16v-5M12 16V8M16 16v-8" fill="none" stroke="currentColor" stroke-linecap="round"/></symbol>
+    <symbol id="building" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M16 9h2a2 2 0 0 1 2 2v10M8 7h4M8 11h4M8 15h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" fill="none" stroke="currentColor"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18" fill="none" stroke="currentColor" stroke-linecap="round"/></symbol>
+    <symbol id="video" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2" fill="none" stroke="currentColor"/><path d="m16 11 5-3v8l-5-3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="background">
+    <div class="blob one"></div><div class="blob two"></div><div class="blob three"></div>
+    <div class="orb one"></div><div class="orb two"></div><div class="orb three"></div>
+  </div>
+
+  <nav>
+    <div class="container nav-inner">
+      <a class="brand" href="#top"><svg width="32" height="32"><use href="#shield-check"/></svg><span>Smart<span>Helmet</span></span></a>
+      <div class="nav-links"><a href="#about">About</a><a href="#how-it-works">How it Works</a><a href="#architecture">Architecture</a><a href="#tech">Technology</a><a href="#demo">Demo</a></div>
+      <a class="nav-cta" href="#demo">View Demo <svg width="16" height="16"><use href="#arrow"/></svg></a>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="badge"><svg width="18" height="18"><use href="#cpu"/></svg> IoT Academic Project · Raspberry Pi · Firebase · Computer Vision</div>
+        <h1>Smart Helmet Detection <br><span class="gradient-text">System for Motorcyclists</span></h1>
+        <p>An IoT safety system that captures a motorcyclist image using Raspberry Pi, analyzes helmet usage on a local server, syncs the result with Firebase, and controls a physical traffic light and OLED display.</p>
+        <div class="btn-row"><a class="btn btn-primary" href="#how-it-works">Explore System Flow <svg width="22" height="22"><use href="#arrow"/></svg></a><a class="btn btn-secondary" href="#demo">View Results</a></div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="container">
+        <div class="section-title"><h2>Problem & <span class="gradient-text">Solution</span></h2><p>The system addresses a real road-safety challenge through an automatic and scalable IoT solution.</p></div>
+        <div class="grid-2">
+          <div class="card glass problem-card"><div class="icon-box rose"><svg><use href="#shield-alert"/></svg></div><h3>The Problem</h3><p>Helmet use is a major factor in motorcyclist safety. At intersections, enforcement is often manual or inconsistent, and a rider without a helmet can enter traffic without immediate automatic response.</p></div>
+          <div class="card glass problem-card"><div class="icon-box emerald"><svg><use href="#shield-check"/></svg></div><h3>Our Solution</h3><p>The system detects a motorcycle rider and checks helmet usage. If a rider is detected without a helmet, the Raspberry Pi can keep the traffic light red and show a warning on the OLED display.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="section-muted">
+      <div class="container">
+        <div class="section-title"><h2>How It <span class="gradient-text">Works</span></h2><p>A clear IoT pipeline: edge capture, local server processing, cloud logging, and physical hardware response.</p></div>
+        <div class="grid-5">
+          <div class="card glass step-card"><div class="step-number">STEP 01</div><div class="icon-box cyan"><svg><use href="#camera"/></svg></div><h3>Image Capture</h3><p>The Raspberry Pi camera captures an image of the motorcyclist at the intersection.</p></div>
+          <div class="card glass step-card"><div class="step-number">STEP 02</div><div class="icon-box cyan"><svg><use href="#server"/></svg></div><h3>Server Upload</h3><p>The image is sent over the local network to the processing server.</p></div>
+          <div class="card glass step-card"><div class="step-number">STEP 03</div><div class="icon-box cyan"><svg><use href="#brain"/></svg></div><h3>Model Analysis</h3><p>The computer vision model detects the motorcycle, rider, and helmet status.</p></div>
+          <div class="card glass step-card"><div class="step-number">STEP 04</div><div class="icon-box cyan"><svg><use href="#database"/></svg></div><h3>Firebase Log</h3><p>The detection result is saved to Firebase Firestore as structured JSON data.</p></div>
+          <div class="card glass step-card"><div class="step-number">STEP 05</div><div class="icon-box cyan"><svg><use href="#traffic"/></svg></div><h3>Physical Output</h3><p>The Raspberry Pi uses the result to control the traffic light and OLED warning display.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="container">
+        <div class="section-title"><h2>System <span class="gradient-text">Architecture</span></h2><p>The project separates the Raspberry Pi hardware layer from the heavy computer vision processing, making the workflow stable and practical for IoT.</p></div>
+        <div class="grid-4">
+          <div class="card glass architecture-card"><div class="icon-box emerald"><svg><use href="#cpu"/></svg></div><h3>Raspberry Pi</h3><p>Camera capture, traffic light control, OLED display, and IoT endpoint logic.</p></div>
+          <div class="card glass architecture-card"><div class="icon-box emerald"><svg><use href="#wifi"/></svg></div><h3>Local Server</h3><p>Receives images from Raspberry Pi and runs the analysis pipeline on the computer.</p></div>
+          <div class="card glass architecture-card"><div class="icon-box emerald"><svg><use href="#brain"/></svg></div><h3>Detection Model</h3><p>Detects motorcycle, rider, and helmet usage from the captured frame.</p></div>
+          <div class="card glass architecture-card"><div class="icon-box emerald"><svg><use href="#cloud"/></svg></div><h3>Firebase Firestore</h3><p>Stores the final detection result and system metadata for cloud integration.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tech" class="section-muted">
+      <div class="container">
+        <div class="section-title"><h2>Core <span class="gradient-text">Technologies</span></h2><p>The system combines embedded hardware, networking, computer vision, and cloud data storage into one complete IoT product.</p></div>
+        <div class="grid-3">
+          <div class="card glass"><div class="icon-box"><svg><use href="#cpu"/></svg></div><h3>Raspberry Pi</h3><p>IoT edge device, camera capture, GPIO control.</p></div>
+          <div class="card glass"><div class="icon-box"><svg><use href="#code"/></svg></div><h3>Python</h3><p>Core application logic, server, hardware integration.</p></div>
+          <div class="card glass"><div class="icon-box"><svg><use href="#brain"/></svg></div><h3>Computer Vision</h3><p>Object detection for motorcycle, rider, and helmet status.</p></div>
+          <div class="card glass"><div class="icon-box"><svg><use href="#database"/></svg></div><h3>Firebase Firestore</h3><p>Cloud logging and result synchronization.</p></div>
+          <div class="card glass"><div class="icon-box"><svg><use href="#wifi"/></svg></div><h3>Local Networking</h3><p>Image transfer from Raspberry Pi to processing server.</p></div>
+          <div class="card glass"><div class="icon-box"><svg><use href="#traffic"/></svg></div><h3>Traffic Light LEDs</h3><p>Physical output controlled according to detection decision.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="model">
+      <div class="container model-wrap">
+        <div class="model-text">
+          <div class="eyebrow"><svg width="18" height="18"><use href="#brain"/></svg> Detection Logic</div>
+          <h2>Two-Stage <span class="gradient-text">Vision Analysis</span></h2>
+          <p>The project uses two detection stages. The first detects people and motorcycles. The second checks helmet usage. The logic then matches the rider to the motorcycle and checks the rider head area for helmet detection.</p>
+          <ul class="logic-list">
+            <li><svg width="22" height="22"><use href="#chevron"/></svg><span><strong>Motorcycle detection:</strong> verifies that the scene contains a motorcycle.</span></li>
+            <li><svg width="22" height="22"><use href="#chevron"/></svg><span><strong>Rider association:</strong> checks whether a detected person belongs to the motorcycle area.</span></li>
+            <li><svg width="22" height="22"><use href="#chevron"/></svg><span><strong>Helmet validation:</strong> checks whether the rider has a detected helmet on the head region.</span></li>
+          </ul>
+        </div>
+        <div class="result-visual glass">
+          <div class="result-chip"><svg><use href="#brain"/></svg></div>
+          <h3>Computer Vision Result</h3>
+          <p>The final output is a structured result containing motorcycle presence, rider count, helmet count, and whether green light is allowed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="section-muted">
+      <div class="container">
+        <div class="section-title"><div class="eyebrow" style="justify-content:center;color:var(--amber)"><svg width="18" height="18"><use href="#video"/></svg> Project Demonstration</div><h2>System <span class="gradient-text">In Action</span></h2><p>The demo shows the detection result, bounding boxes, and the final decision that controls the physical output.</p></div>
+        <div class="demo-grid">
+          <div class="card glass" style="text-align:center;align-items:center;justify-content:center">
+            <div class="icon-box emerald" style="margin-bottom:16px"><svg><use href="#video"/></svg></div>
+            <h3>Marketing Video</h3>
+            <p style="margin-bottom:20px">Watch a short overview of the system, including the idea, workflow, and real-time behavior.</p>
+            <a class="btn btn-primary" href="https://www.canva.com/design/DAHHNaJcIeU/cq8dTSYuMmz58X88gpD96w/view" target="_blank">
+              ▶ Watch Video
+            </a>
+          </div>
+
+          <div class="card glass" style="text-align:center;align-items:center;justify-content:center;border-color:rgba(251,113,133,0.2)">
+            <div class="eyebrow" style="color:var(--rose)"><svg width="20" height="20"><use href="#shield-alert"/></svg> Example Output</div>
+            <div class="output-list"><div class="output-row"><span>Motorcycle</span><strong>Detected</strong></div><div class="output-row"><span>Riders</span><strong>1</strong></div><div class="output-row"><span>Helmet</span><strong style="color:var(--rose)">Not Detected</strong></div><div class="output-row warning"><span>Traffic Light</span><strong>Stay Red</strong></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results">
+      <div class="container">
+        <div class="section-title"><h2>Model <span class="gradient-text">Evaluation</span></h2><p>The detection model was evaluated in Google Colab using validation images.</p></div>
+        <div class="card glass">
+          <p>The model was tested on approximately 300 validation images using <strong>model.val</strong>. The evaluation included standard object-detection metrics used to estimate model reliability for the project.</p>
+          <div class="metrics">
+            <div class="metric"><strong>~80%</strong><span>Precision</span></div>
+            <div class="metric"><strong>~74%</strong><span>Recall</span></div>
+            <div class="metric"><strong>~76%</strong><span>mAP50</span></div>
+            <div class="metric"><strong>~0.1</strong><span>mAP50-95</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="business" class="section-muted">
+      <div class="container">
+        <div class="section-title"><h2>Business <span class="gradient-text">Potential</span></h2><p>The project demonstrates how IoT and computer vision can support safer intersections, smart-city infrastructure, and automated safety monitoring.</p></div>
+        <div class="grid-3">
+          <div class="card glass"><div class="icon-box emerald"><svg><use href="#building"/></svg></div><h3>Smart City Integration</h3><p>A future version could be integrated into smart intersections to support automated road-safety enforcement.</p></div>
+          <div class="card glass"><div class="icon-box emerald"><svg><use href="#briefcase"/></svg></div><h3>Safety Monitoring</h3><p>Traffic authorities could use collected results to identify dangerous areas and improve rider safety.</p></div>
+          <div class="card glass"><div class="icon-box emerald"><svg><use href="#chart"/></svg></div><h3>Data Analytics</h3><p>Firestore results can later be used for reports, dashboards, and violation trend analysis.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="team">
+      <div class="container">
+        <div class="section-title"><h2>Project <span class="gradient-text">Team</span></h2><p>The project was developed collaboratively as part of an IoT academic course.</p></div>
+        <div class="grid-2">
+          <div class="card glass team-card"><div class="avatar">A</div><h3>Aelita Kaganovich</h3><p>Electronics, ML Model & Server</p></div>
+          <div class="card glass team-card"><div class="avatar" style="background:linear-gradient(135deg,var(--emerald),var(--cyan))">A</div><h3>Adell Barayev</h3><p>Visualization, Firebase & Integration</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="links" class="section-muted">
+      <div class="container">
+        <div class="section-title"><h2>Project <span class="gradient-text">Links</span></h2><p>Explore the full project repository and video materials.</p></div>
+        <div class="btn-row"><a class="btn btn-primary" href="https://github.com/aelitakag/HelmetTrafficLight-IoT" target="_blank">GitHub Repository</a><a class="btn btn-secondary" href="https://drive.google.com/file/d/1GdEjI-abEMCnFgY3xyuO2gIH3euUzrrT/view?usp=sharing" target="_blank">Marketing Video</a><a class="btn btn-secondary" href="https://www.canva.com/design/DAHHNaJcIeU/cq8dTSYuMmz58X88gpD96w/view" target="_blank">Demo Video</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner"><a class="brand" href="#top" style="font-size:1.1rem"><svg width="24" height="24"><use href="#shield-check"/></svg><span>Smart<span>Helmet</span></span></a><p>Created by Aelita Kaganovich & Adell Barayev</p></div>
+  </footer>
+</body>
+</html>
